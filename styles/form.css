@@ -1,0 +1,74 @@
+.form-col-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 16px;
+  
+    @media (max-width: 768px) {
+      grid-template-columns: 1fr;
+    }
+  }
+  
+  .form-col-1 {
+    display: grid;
+    grid-template-columns: 1fr;
+    margin-bottom: 16px;
+  }
+  
+  .form-input {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    position: relative;
+  
+    label {
+      font-weight: 700;
+    }
+  
+    input,
+    textarea {
+      border: 2px solid var(--grey);
+      border-radius: 5px;
+      padding: 0 12px;
+      outline: 2px solid transparent;
+      outline-offset: -2px;
+      transition: outline 0.2s ease;
+      font-family: inherit;
+      font-size: 16px;
+    }
+  
+    input {
+      height: 50px;
+    }
+  
+    textarea {
+      height: 200px;
+      resize: vertical;
+      padding: 12px;
+    }
+  
+    input:hover,
+    textarea:hover,
+    input:focus,
+    textarea:focus,
+    input:not(:placeholder-shown),
+    textarea:not(:placeholder-shown) {
+      outline: 2px solid var(--primary);
+    }
+  
+    /* ✅ Red outline if .form-error is on the input */
+    input.form-error,
+    textarea.form-error {
+      outline: 2px solid #ff0000;
+    }
+  
+    /* ✅ Show error message from the parent when it contains a .form-error input/textarea */
+    &.has-error::after {
+      content: '*field required';
+      color: #ff0000;
+      font-size: 12px;
+      position: absolute;
+      left: 0;
+      bottom: -16px;
+    }
+  }

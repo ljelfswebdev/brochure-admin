@@ -1,0 +1,79 @@
+body {
+    /* H1 */
+    --font-min-h1: 40px;
+    --font-max-h1: 60px;
+    --lh-min-h1: 44px;
+    --lh-max-h1: 64px;
+  
+    /* H2 */
+    --font-min-h2: 32px;
+    --font-max-h2: 48px;
+    --lh-min-h2: 36px;
+    --lh-max-h2: 54px;
+  
+    /* H3 */
+    --font-min-h3: 28px;
+    --font-max-h3: 40px;
+    --lh-min-h3: 32px;
+    --lh-max-h3: 44px;
+  
+    /* H4 */
+    --font-min-h4: 24px;
+    --font-max-h4: 32px;
+    --lh-min-h4: 28px;
+    --lh-max-h4: 36px;
+  
+    /* H5 */
+    --font-min-h5: 20px;
+    --font-max-h5: 24px;
+    --lh-min-h5: 24px;
+    --lh-max-h5: 28px;
+  
+    /* H6 */
+    --font-min-h6: 18px;
+    --font-max-h6: 18px;
+    --lh-min-h6: 22px;
+    --lh-max-h6: 22px;
+  }
+  
+  body h1,
+  body .h1 {
+    font-size: clamp(var(--font-min-h1), 8vw, var(--font-max-h1));
+    line-height: clamp(var(--lh-min-h1), 8vw, var(--lh-max-h1));
+    font-weight: 700;
+  }
+  
+  body h2,
+  body .h2 {
+    font-size: clamp(var(--font-min-h2), 8vw, var(--font-max-h2));
+    line-height: clamp(var(--lh-min-h2), 8vw, var(--lh-max-h2));
+    font-weight: 700;
+  }
+  
+  body h3,
+  body .h3 {
+    font-size: clamp(var(--font-min-h3), 8vw, var(--font-max-h3));
+    line-height: clamp(var(--lh-min-h3), 8vw, var(--lh-max-h3));
+    font-weight: 700;
+  }
+  
+  body h4,
+  body .h4 {
+    font-size: clamp(var(--font-min-h4), 8vw, var(--font-max-h4));
+    line-height: clamp(var(--lh-min-h4), 8vw, var(--lh-max-h4));
+    font-weight: 700;
+  }
+  
+  body h5,
+  body .h5 {
+    font-size: clamp(var(--font-min-h5), 8vw, var(--font-max-h5));
+    line-height: clamp(var(--lh-min-h5), 8vw, var(--lh-max-h5));
+    font-weight: 700;
+  }
+  
+  body h6,
+  body .h6 {
+    font-size: var(--font-max-h6);
+    line-height: var(--lh-max-h6);
+    font-weight: 700;
+  }
