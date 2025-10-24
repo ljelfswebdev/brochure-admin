@@ -1,15 +1,16 @@
 import mongoose from 'mongoose';
-const BlockSchema = new mongoose.Schema({
-  type: { type: String, required: true },
-  data: { type: mongoose.Schema.Types.Mixed, default: {} },
-}, { _id: false });
 
 const NewsSchema = new mongoose.Schema({
-  title: String,
-  slug: { type: String, unique: true, index: true },
-  blocks: [BlockSchema],
+  title: { type: String, required: true },
+  slug:  { type: String, required: true, unique: true, index: true },
+  excerpt: String,
+  body: String,                      // optional legacy body
+  listingImage: String,
+  status: { type: String, enum: ['draft','published'], default: 'published' },
   categories: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Category' }],
-  listingImage: String
+
+  // 🔑 page-builder style blocks (allow any shape)
+  blocks: { type: Array, default: [] },
 }, { timestamps: true });
 
 export default mongoose.models.News || mongoose.model('News', NewsSchema);

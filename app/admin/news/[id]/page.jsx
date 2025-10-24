@@ -2,64 +2,81 @@
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
-import Blocks from '@/components/admin/blocks/PageBlocks';
 import CloudinaryUpload from '@/components/admin/CloudinaryUpload';
+import PageBlocks from '@/components/admin/blocks/PageBlocks';
 
 export default function EditNews() {
   const { id } = useParams();
   const router = useRouter();
 
+  const [cats, setCats] = useState([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
+  // form state
   const [title, setTitle] = useState('');
   const [slug, setSlug] = useState('');
+  const [excerpt, setExcerpt] = useState('');
+  const [body, setBody] = useState('');
   const [listingImage, setListingImage] = useState('');
+  const [status, setStatus] = useState('published');
+  const [categoryIds, setCategoryIds] = useState([]);
   const [blocks, setBlocks] = useState([]);
-  const [cats, setCats] = useState([]);
-  const [categories, setCategories] = useState([]);
 
   useEffect(() => {
-    let cancelled = false;
+    let cancel = false;
     (async () => {
       try {
-        const [rPost, rCats] = await Promise.all([
+        const [rDoc, rCats] = await Promise.all([
           fetch(`/api/admin/news/${id}`, { cache: 'no-store' }),
           fetch('/api/admin/categories', { cache: 'no-store' }),
         ]);
-        if (!rPost.ok) throw new Error('Failed to load post');
-        const p = await rPost.json();
-        const c = await rCats.json();
-        if (cancelled) return;
-        setTitle(p.title || '');
-        setSlug(p.slug || '');
-        setListingImage(p.listingImage || '');
-        setBlocks(Array.isArray(p.blocks) ? p.blocks : []);
-        setCategories(Array.isArray(p.categories) ? p.categories.map(String) : []);
+        if (!rDoc.ok) throw new Error('Failed to load');
+        const d = await rDoc.json();
+        const c = rCats.ok ? await rCats.json() : [];
+        if (cancel) return;
         setCats(Array.isArray(c) ? c : []);
+        setTitle(d.title || '');
+        setSlug(d.slug || '');
+        setExcerpt(d.excerpt || '');
+        setBody(d.body || '');
+        setListingImage(d.listingImage || '');
+        setStatus(d.status || 'published');
+        setCategoryIds(Array.isArray(d.categories) ? d.categories.map(String) : []);
+        setBlocks(Array.isArray(d.blocks) ? d.blocks : []);
       } catch (e) {
-        toast.error(e.message || 'Error loading data');
+        toast.error(e.message || 'Load failed');
       } finally {
-        if (!cancelled) setLoading(false);
+        if (!cancel) setLoading(false);
       }
     })();
-    return () => { cancelled = true; };
+    return () => { cancel = true; };
   }, [id]);
 
-  function toggleCat(id) {
-    setCategories(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]);
+  function toggleCat(cid) {
+    setCategoryIds(prev => prev.includes(cid) ? prev.filter(x => x !== cid) : [...prev, cid]);
   }
 
   async function save() {
     setSaving(true);
     try {
+      const payload = {
+        title,
+        slug: slug.replace(/^\//,''),
+        excerpt,
+        body,
+        listingImage,
+        status,
+        categories: categoryIds,
+        blocks, // ✅ save blocks
+      };
       const r = await fetch(`/api/admin/news/${id}`, {
         method: 'PATCH',
         headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ title, slug, listingImage, blocks, categories }),
+        body: JSON.stringify(payload),
       });
       if (!r.ok) throw new Error(await r.text());
-      toast.success('Post updated');
+      toast.success('Saved');
     } catch (e) {
       toast.error(e.message || 'Save failed');
     } finally {
@@ -79,13 +96,12 @@ export default function EditNews() {
 
   return (
     <div className="space-y-6">
-      <a href="/admin/news" className="inline-flex items-center gap-1 text-sm text-blue-600 hover:underline">← Back to News</a>
-
+      <a href="/admin/news" className="text-sm text-blue-600 hover:underline">← Back to News</a>
       <div className="card">
         <div className="flex items-center justify-between">
-          <h3 className="text-lg font-semibold">Edit Post</h3>
+          <h1 className="text-lg font-semibold">Edit News</h1>
           <div className="flex gap-2">
-            <a className="button button--secondary" href={`/news/${slug}`} target="_blank" rel="noreferrer">View</a>
+            <a className="button button--secondary" href={`/news/${slug}`} target="_blank">View</a>
             <button className="button button--tertiary" onClick={remove}>Delete</button>
           </div>
         </div>
@@ -94,20 +110,29 @@ export default function EditNews() {
         <input className="input w-full" value={title} onChange={e=>setTitle(e.target.value)} />
 
         <label className="label mt-2">Slug</label>
-        <input className="input w-full" value={slug} onChange={e=>setSlug(e.target.value.replace(/^\//,''))} />
+        <input className="input w-full" value={slug} onChange={e=>setSlug(e.target.value)} />
+
+        <label className="label mt-2">Excerpt</label>
+        <textarea className="input w-full" value={excerpt} onChange={e=>setExcerpt(e.target.value)} />
 
         <label className="label mt-2">Listing Image</label>
         <CloudinaryUpload value={listingImage} onChange={setListingImage} />
 
-        <div className="mt-3">
-          <label className="label">Categories</label>
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+        <label className="label mt-2">Status</label>
+        <select className="input" value={status} onChange={e=>setStatus(e.target.value)}>
+          <option value="published">Published</option>
+          <option value="draft">Draft</option>
+        </select>
+
+        <div className="mt-2">
+          <div className="label">Categories</div>
+          <div className="grid grid-cols-2 gap-2">
             {cats.map(c => (
-              <label key={c._id} className="flex items-center gap-2 border rounded-xl px-2 py-1">
+              <label key={c._id} className="flex items-center gap-2 text-sm border rounded-md px-2 py-1">
                 <input
                   type="checkbox"
-                  checked={categories.includes(String(c._id))}
-                  onChange={()=>toggleCat(String(c._id))}
+                  checked={categoryIds.includes(c._id)}
+                  onChange={() => toggleCat(c._id)}
                 />
                 {c.name}
               </label>
@@ -115,8 +140,12 @@ export default function EditNews() {
           </div>
         </div>
 
+        <label className="label mt-3">Body (optional)</label>
+        <textarea className="input w-full" value={body} onChange={e=>setBody(e.target.value)} />
+
         <div className="mt-4">
-          <Blocks value={blocks} onChange={setBlocks} />
+          <div className="label mb-2">Blocks</div>
+          <PageBlocks value={blocks} onChange={setBlocks} />
         </div>
 
         <div className="flex justify-end mt-4">
