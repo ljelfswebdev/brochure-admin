@@ -2,9 +2,10 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Pagination } from 'swiper/modules';
+import { motion } from 'framer-motion';
 import 'swiper/css';
 import 'swiper/css/pagination';
 
@@ -12,52 +13,56 @@ export default function Banner(props) {
   const size = props.size || 'large';
   const slides = Array.isArray(props.slides) ? props.slides : [];
 
+  if (!slides.length) return null;
+
   const padClass = useMemo(() => {
     if (size === 'small') return 'py-20';
     if (size === 'medium') return 'py-32';
-    return 'py-48'; // large
+    return 'py-48';
   }, [size]);
 
-  if (!slides.length) return null;
-
-  // normalize helper: accept string or object with url/secure_url
   const getUrl = (img) => {
     if (!img) return '';
     if (typeof img === 'string') return img;
     return img.url || img.secure_url || '';
   };
 
-  const Content = ({ s }) => {
+  // Single slide content (with zoom-in effect)
+  const Content = ({ s, active }) => {
     const imgUrl = getUrl(s.image);
     return (
       <section
         className={`relative w-full overflow-hidden ${padClass}`}
-        // full-width background image
       >
-        {/* Background */}
+        {/* Background image */}
         <div className="absolute inset-0 -z-10">
-          {imgUrl ? (
-            <Image
-              src={imgUrl}
-              alt={s.title || s.subtitle || ''}
-              fill
-              sizes="100vw"
-              className="object-cover object-center"
-              priority={false}
-            />
-          ) : null}
-          {/* optional subtle overlay for legibility; remove if you don't want it */}
+          {imgUrl && (
+            <motion.div
+              key={imgUrl}
+              initial={{ scale: 1 }}
+              animate={active ? { scale: 1.1 } : { scale: 1 }}
+              transition={{ duration: 6, ease: 'easeOut' }}
+              className="absolute inset-0"
+            >
+              <Image
+                src={imgUrl}
+                alt={s.title || s.subtitle || ''}
+                fill
+                sizes="100vw"
+                className="object-cover object-center"
+                priority={false}
+              />
+            </motion.div>
+          )}
           <div className="absolute inset-0 bg-black/25" />
         </div>
 
-        {/* Centered content */}
+        {/* Centered text */}
         <div className="container mx-auto px-4">
           <div className="max-w-3xl mx-auto text-center text-white">
             {s.subtitle ? <div className="mb-2">{s.subtitle}</div> : null}
             {s.title ? (
-              <h2 className="text-3xl md:text-5xl font-semibold">
-                {s.title}
-              </h2>
+              <h2 className="text-3xl md:text-5xl font-semibold">{s.title}</h2>
             ) : null}
             {s.text ? (
               <div
@@ -78,35 +83,37 @@ export default function Banner(props) {
     );
   };
 
-  // Single slide: no Swiper
+  // SINGLE SLIDE — simple fade-in zoom
   if (slides.length === 1) {
     return (
       <div data-block="banner" data-size={size} className="w-full">
-        <Content s={slides[0]} />
+        <Content s={slides[0]} active />
       </div>
     );
   }
 
-  // Multiple slides: Swiper with pagination dots (primary color)
+  // MULTI SLIDE — Swiper with zoom-in on active slide
+  const [activeIndex, setActiveIndex] = useState(0);
+
   return (
     <div data-block="banner" data-size={size} className="w-full">
-      {/* Wrap with text-primary so bullets use your primary color via currentColor */}
       <div className="text-primary">
         <Swiper
           modules={[Pagination]}
           pagination={{ clickable: true }}
           slidesPerView={1}
-          loop={true}
+          loop
+          onSlideChange={(swiper) => setActiveIndex(swiper.realIndex)}
         >
           {slides.map((s, i) => (
             <SwiperSlide key={i}>
-              <Content s={s} />
+              <Content s={s} active={i === activeIndex} />
             </SwiperSlide>
           ))}
         </Swiper>
       </div>
 
-      {/* Make Swiper bullets small and use currentColor (inherits from text-primary wrapper) */}
+      {/* Pagination styling */}
       <style jsx global>{`
         .swiper-pagination-bullets {
           bottom: 12px !important;
