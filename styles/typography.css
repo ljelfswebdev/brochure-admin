@@ -1,21 +1,21 @@
 body {
     /* H1 */
-    --font-min-h1: 40px;
-    --font-max-h1: 60px;
-    --lh-min-h1: 44px;
-    --lh-max-h1: 64px;
+    --font-min-h1: 80px;
+    --font-max-h1: 100px;
+    --lh-min-h1: 90px;
+    --lh-max-h1: 110px;
   
     /* H2 */
-    --font-min-h2: 32px;
-    --font-max-h2: 48px;
-    --lh-min-h2: 36px;
-    --lh-max-h2: 54px;
+    --font-min-h2: 80px;
+    --font-max-h2: 60px;
+    --lh-min-h2: 70px;
+    --lh-max-h2: 90px;
   
     /* H3 */
-    --font-min-h3: 28px;
+    --font-min-h3: 60px;
     --font-max-h3: 40px;
-    --lh-min-h3: 32px;
-    --lh-max-h3: 44px;
+    --lh-min-h3: 50px;
+    --lh-max-h3: 70px;
   
     /* H4 */
     --font-min-h4: 24px;
@@ -41,6 +41,7 @@ body {
     font-size: clamp(var(--font-min-h1), 8vw, var(--font-max-h1));
     line-height: clamp(var(--lh-min-h1), 8vw, var(--lh-max-h1));
     font-weight: 700;
+    font-family: 'Luxurious Script', cursive;
   }
   
   body h2,
@@ -48,6 +49,7 @@ body {
     font-size: clamp(var(--font-min-h2), 8vw, var(--font-max-h2));
     line-height: clamp(var(--lh-min-h2), 8vw, var(--lh-max-h2));
     font-weight: 700;
+    font-family: 'Luxurious Script', cursive;
   }
   
   body h3,
@@ -55,6 +57,7 @@ body {
     font-size: clamp(var(--font-min-h3), 8vw, var(--font-max-h3));
     line-height: clamp(var(--lh-min-h3), 8vw, var(--lh-max-h3));
     font-weight: 700;
+    font-family: 'Luxurious Script', cursive;
   }
   
   body h4,
@@ -62,6 +65,7 @@ body {
     font-size: clamp(var(--font-min-h4), 8vw, var(--font-max-h4));
     line-height: clamp(var(--lh-min-h4), 8vw, var(--lh-max-h4));
     font-weight: 700;
+
   }
   
   body h5,

@@ -100,20 +100,19 @@ export default function NewsSidebar({ categories = [], basePath = '/news' }) {
       )}
 
       {/* Search (always visible) */}
-      <div>
-        <label className="label">Search</label>
+      <div className="form-input">
+        <label className="label h3">Search</label>
         <input
           className="input w-full"
           placeholder="Search news..."
           value={q}
           onChange={onSearchChange}
         />
-        <p className="text-xs text-gray-500 mt-1">Auto-applies after 3 seconds.</p>
       </div>
 
       {/* Categories header + mobile toggle */}
       <div className="flex items-center justify-between md:block">
-        <div className="label mb-2">Categories</div>
+        <div className="label mb-2 h3">Categories</div>
         <button
           type="button"
           className="button button--tertiary px-2 py-1 text-sm md:hidden"
@@ -132,22 +131,51 @@ export default function NewsSidebar({ categories = [], basePath = '/news' }) {
         id="news-cats"
         className={`${mobileCatsOpen ? 'block' : 'hidden'} md:block`}
       >
-        <div className="space-y-2">
-          {visibleCats.map((c) => {
-            const id = String(c._id);
-            const checked = selected.has(id);
-            return (
-              <label key={id} className="flex items-center gap-2 text-sm">
-                <input
-                  type="checkbox"
-                  checked={checked}
-                  onChange={() => onToggleCat(id)}
-                />
-                <span>{c.name}</span>
-              </label>
-            );
-          })}
-        </div>
+<div className="space-y-2">
+  {visibleCats.map((c) => {
+    const id = String(c._id);
+    const checked = selected.has(id);
+
+    return (
+      <label
+        key={id}
+        htmlFor={`cat-${id}`}
+        className="flex items-center gap-3 text-sm cursor-pointer select-none"
+      >
+        {/* the controller */}
+        <input
+          id={`cat-${id}`}
+          type="checkbox"
+          checked={checked}
+          onChange={() => onToggleCat(id)}
+          className="peer sr-only"
+        />
+
+        {/* custom box */}
+        <span
+          className={`
+            relative inline-flex h-5 w-5 items-center justify-center rounded-md
+            border border-white transition-all duration-300
+            peer-checked:bg-primary peer-checked:border-primary
+           
+            after:content-['✓'] after:absolute after:inset-0 after:flex after:items-center after:justify-center
+            after:text-white after:text-lg after:leading-none
+            after:opacity-0 peer-checked:after:opacity-100
+            after:transition-opacity after:duration-300
+
+            peer-checked:scale-95
+          `}
+          style={{ fontFamily: '"Luxurious Script", cursive' }}
+        />
+
+        {/* label text */}
+        <span className="text-gray-700 transition-colors peer-checked:text-primary">
+          {c.name}
+        </span>
+      </label>
+    );
+  })}
+</div>
 
         {categories.length > 5 && (
           <button

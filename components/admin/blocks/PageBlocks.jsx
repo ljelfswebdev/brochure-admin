@@ -1,5 +1,6 @@
+// components/admin/blocks/PageBlocks.jsx
 'use client';
-import React, { useMemo, useRef, useState } from 'react';
+import React, { useRef, useState } from 'react';
 import CloudinaryUpload from '@/components/admin/CloudinaryUpload';
 import RichTextEditor from '@/components/admin/RichTextEditor';
 
@@ -65,7 +66,7 @@ export default function PageBlocks({ value = [], onChange }) {
         link: { text: '', url: '' },
         faqs: [],
       },
-      'images-section': { type: 'images-section', items: [] },
+      'images-section': { type: 'images-section', title: '', text: '', items: [] },
     };
     onChange([...(blocks || []), defaults[type]]);
   }
@@ -74,7 +75,7 @@ export default function PageBlocks({ value = [], onChange }) {
   function onDragStart(e, i) {
     dragFrom.current = i;
     e.dataTransfer.effectAllowed = 'move';
-    e.dataTransfer.setData('text/plain', String(i)); // for Firefox
+    e.dataTransfer.setData('text/plain', String(i)); // Firefox
   }
   function onDragOver(e) {
     e.preventDefault();
@@ -86,6 +87,7 @@ export default function PageBlocks({ value = [], onChange }) {
     const to = i;
     if (Number.isInteger(from) && Number.isInteger(to) && from !== to) {
       onChange(move(blocks, from, to));
+      // keep collapsed state aligned
       setCollapsed((prev) => {
         const remapped = {};
         const oldKeys = Object.keys(prev);
@@ -495,6 +497,23 @@ export default function PageBlocks({ value = [], onChange }) {
                 {/* ---------------- Images Section ---------------- */}
                 {block.type === 'images-section' && (
                   <>
+                    {/* Block-level heading + subtext */}
+                    <label className="label">Section Title</label>
+                    <input
+                      className="input w-full"
+                      value={block.title || ''}
+                      onChange={(e) => updateBlock(i, { ...block, title: e.target.value })}
+                      placeholder="e.g. Our Gallery"
+                    />
+
+                    <label className="label mt-2">Section Subtext</label>
+                    <RichTextEditor
+                      value={block.text || ''}
+                      onChange={(val) => updateBlock(i, { ...block, text: val })}
+                    />
+
+                    <hr className="my-4" />
+
                     <div className="space-y-3">
                       {(block.items || []).map((it, j) => (
                         <div key={j} className="border rounded-xl p-3 bg-white space-y-2">
@@ -534,12 +553,12 @@ export default function PageBlocks({ value = [], onChange }) {
                             }}
                           />
 
-                          <label className="label">Text</label>
+                          <label className="label">Text (HTML supported)</label>
                           <RichTextEditor
                             value={it.text || ''}
-                            onChange={(html) => {
+                            onChange={(val) => {
                               const items = [...(block.items || [])];
-                              items[j] = { ...it, text: html };
+                              items[j] = { ...it, text: val };
                               updateBlock(i, { ...block, items });
                             }}
                           />

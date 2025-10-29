@@ -27,27 +27,15 @@ export default function HeaderClient({ items = [], phone = '' }) {
 
   return (
     <>
-      {/* Mobile call bar (visible < md) */}
-      {telHref && (
-        <div className="md:hidden bg-secondary">
-          <div className="container mx-auto px-4">
-            <a
-              href={telHref}
-              className="block w-full text-center py-2 text-white font-medium"
-            >
-              Call us: {phone}
-            </a>
-          </div>
-        </div>
-      )}
+
 
       {/* Main header */}
-      <header className="w-full bg-black text-white">
-        <div className="container mx-auto px-4">
+      <header className="w-full bg-black text-white py-4">
+        <div className="container">
           <div className="flex h-14 items-center justify-between">
             {/* Left: brand */}
-            <Link href="/" className="font-semibold tracking-tight">
-              My app
+            <Link href="/" className="h2">
+              Paz Gutiérrez
             </Link>
 
             {/* Desktop nav (≥ md) */}
@@ -63,11 +51,7 @@ export default function HeaderClient({ items = [], phone = '' }) {
                   ))}
                 </ul>
               </nav>
-              {telHref && (
-                <a href={telHref} className="button button--primary">
-                  Call {phone}
-                </a>
-              )}
+ 
             </div>
 
             {/* Mobile hamburger (< md) */}
@@ -113,16 +97,6 @@ export default function HeaderClient({ items = [], phone = '' }) {
                     <path d="M6 6l12 12M18 6l-12 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
                   </svg>
                 </button>
-
-                {telHref && (
-                  <a
-                    href={telHref}
-                    className="button button--primary"
-                    onClick={() => setOpen(false)}
-                  >
-                    Call {phone}
-                  </a>
-                )}
               </div>
 
               {/* Links list (centered) */}

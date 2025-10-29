@@ -9,21 +9,46 @@ export default function SettingsAdmin(){
   const [homepageSlug, setHomepageSlug] = useState('');
   const [pageOptions, setPageOptions] = useState([]);
 
-  useEffect(()=>{
-    (async ()=>{
+  useEffect(() => {
+    (async () => {
       const [rS, rP] = await Promise.all([
-        fetch('/api/admin/settings',{cache:'no-store'}),
-        fetch('/api/admin/pages?page=1&limit=1000',{cache:'no-store'}),
+        fetch('/api/admin/settings', { cache: 'no-store' }),
+        fetch('/api/admin/pages?page=1&limit=1000', { cache: 'no-store' }),
       ]);
       const s = (await rS.json()) || {};
       const p = (await rP.json()) || {};
-      setContact(s.contactNumber||'');
-      setEmail(s.emailAddress||'');
-      setSocials(s.socials||{});
-      setHomepageSlug(s.homepageSlug||'');
+
+      setContact(s.contactNumber || '');
+      setEmail(s.emailAddress || '');
+      setSocials(s.socials || {});
+
+      // 👇 if the homepage slug is "/", we’ll preselect the "homepage" page if it exists
+      const loadedSlug = s.homepageSlug === '/' ? 'homepage' : s.homepageSlug || '';
+      setHomepageSlug(loadedSlug);
+
       setPageOptions(Array.isArray(p.items) ? p.items : []);
     })();
-  },[]);
+  }, []);
+
+  async function save() {
+    // 👇 normalize slug before saving
+    let slugToSave = homepageSlug;
+    if (slugToSave === 'homepage') slugToSave = '/';
+
+    const r = await fetch('/api/admin/settings', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({
+        contactNumber,
+        emailAddress,
+        socials,
+        homepageSlug: slugToSave,
+      }),
+    });
+
+    if (!r.ok) return toast.error('Save failed');
+    toast.success('Saved');
+  }
 
   async function save(){
     const r = await fetch('/api/admin/settings',{

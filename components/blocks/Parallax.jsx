@@ -39,7 +39,7 @@ export default function Parallax({ title, text, link, image }) {
     >
       {/* Background image behind content */}
       <div
-        className="absolute inset-0 -z-10 will-change-transform"
+        className="absolute inset-0 -z-10 will-change-transform h-[120%] -top-[10%]"
         style={{ transform: `translateY(${y}px)` }}
         aria-hidden="true"
       >
@@ -58,7 +58,7 @@ export default function Parallax({ title, text, link, image }) {
 
       {/* Content */}
       <div className="mx-auto max-w-4xl px-6 text-center text-white">
-        {title ? <h2 className="text-3xl md:text-5xl font-semibold">{title}</h2> : null}
+        {title ? <div className="h1">{title}</div> : null}
 
         {text ? (
           <div

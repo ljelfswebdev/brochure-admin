@@ -18,7 +18,7 @@ export default function Banner(props) {
   const padClass = useMemo(() => {
     if (size === 'small') return 'py-20';
     if (size === 'medium') return 'py-32';
-    return 'py-48';
+    return 'aspect-video w-sceeen';
   }, [size]);
 
   const getUrl = (img) => {
@@ -40,7 +40,7 @@ export default function Banner(props) {
             <motion.div
               key={imgUrl}
               initial={{ scale: 1 }}
-              animate={active ? { scale: 1.1 } : { scale: 1 }}
+              animate={active ? { scale: 1.03 } : { scale: 1 }}
               transition={{ duration: 6, ease: 'easeOut' }}
               className="absolute inset-0"
             >
@@ -54,7 +54,7 @@ export default function Banner(props) {
               />
             </motion.div>
           )}
-          <div className="absolute inset-0 bg-black/25" />
+          
         </div>
 
         {/* Centered text */}
@@ -62,7 +62,7 @@ export default function Banner(props) {
           <div className="max-w-3xl mx-auto text-center text-white">
             {s.subtitle ? <div className="mb-2">{s.subtitle}</div> : null}
             {s.title ? (
-              <h2 className="text-3xl md:text-5xl font-semibold">{s.title}</h2>
+              <h1 className="">{s.title}</h1>
             ) : null}
             {s.text ? (
               <div

@@ -3,7 +3,16 @@ import Page from '@/models/Page';
 import { dbConnect } from '@/lib/db';
 import { json, requireRole } from '../../_utils';
 
-function normString(v) { return v == null ? '' : String(v); }
+// Make sure rich editors that return objects (e.g. {html}) are handled
+function normString(v) {
+  if (v == null) return '';
+  if (typeof v === 'string') return v;
+  if (typeof v === 'object') {
+    if (typeof v.html === 'string') return v.html;
+    if (typeof v.value === 'string') return v.value;
+  }
+  return String(v);
+}
 
 export async function GET(_req, { params }) {
   const gate = await requireRole('editor');
@@ -33,13 +42,17 @@ export async function PATCH(req, { params }) {
       const type = String(b.type || '');
 
       if (type === 'banner') {
-        const slides = Array.isArray(b.slides) ? b.slides.map(s => ({
-          image: normString(s?.image),
-          subtitle: normString(s?.subtitle),
-          title: normString(s?.title),
-          text: normString(s?.text),
-          link: s?.link ? { text: normString(s.link.text), url: normString(s.link.url) } : undefined,
-        })) : [];
+        const slides = Array.isArray(b.slides)
+          ? b.slides.map((s) => ({
+              image: normString(s?.image),
+              subtitle: normString(s?.subtitle),
+              title: normString(s?.title),
+              text: normString(s?.text),
+              link: s?.link
+                ? { text: normString(s.link.text), url: normString(s.link.url) }
+                : undefined,
+            }))
+          : [];
         return { type, size: b.size || 'large', slides };
       }
 
@@ -49,8 +62,10 @@ export async function PATCH(req, { params }) {
           title: normString(b.title),
           text: normString(b.text),
           image: normString(b.image),
-          layout: ['text-left','text-right','full'].includes(b.layout) ? b.layout : 'text-left',
-          fullWidthPosition: ['none','top','bottom'].includes(b.fullWidthPosition) ? b.fullWidthPosition : 'none',
+          layout: ['text-left', 'text-right', 'full'].includes(b.layout) ? b.layout : 'text-left',
+          fullWidthPosition: ['none', 'top', 'bottom'].includes(b.fullWidthPosition)
+            ? b.fullWidthPosition
+            : 'none',
         };
       }
 
@@ -59,35 +74,52 @@ export async function PATCH(req, { params }) {
           type,
           title: normString(b.title),
           text: normString(b.text),
-          link: b?.link ? { text: normString(b.link.text), url: normString(b.link.url) } : undefined,
+          link: b?.link
+            ? { text: normString(b.link.text), url: normString(b.link.url) }
+            : undefined,
           image: normString(b.image),
         };
       }
 
       if (type === 'faqs') {
-        const faqs = Array.isArray(b.faqs) ? b.faqs.map(f => ({
-          question: normString(f?.question),
-          answer: normString(f?.answer),
-        })) : [];
+        const faqs = Array.isArray(b.faqs)
+          ? b.faqs.map((f) => ({
+              question: normString(f?.question),
+              answer: normString(f?.answer),
+            }))
+          : [];
         return {
           type,
           title: normString(b.title),
           text: normString(b.text),
-          link: b?.link ? { text: normString(b.link.text), url: normString(b.link.url) } : undefined,
+          link: b?.link
+            ? { text: normString(b.link.text), url: normString(b.link.url) }
+            : undefined,
           faqs,
         };
       }
 
       if (type === 'images-section') {
-        const items = Array.isArray(b.items) ? b.items.map(it => ({
-          image: normString(it?.image),
-          title: normString(it?.title),
-          text: normString(it?.text),
-          link: it?.link ? { text: normString(it.link.text), url: normString(it.link.url) } : undefined,
-        })) : [];
-        return { type, items };
+        const items = Array.isArray(b.items)
+          ? b.items.map((it) => ({
+              image: normString(it?.image),
+              title: normString(it?.title),
+              text: normString(it?.text),
+              link: it?.link
+                ? { text: normString(it.link.text), url: normString(it.link.url) }
+                : undefined,
+            }))
+          : [];
+        // ✅ KEEP the block-level title & text here
+        return {
+          type,
+          title: normString(b.title),
+          text: normString(b.text),
+          items,
+        };
       }
 
+      // default passthrough (keeps future fields)
       return { ...b, type };
     });
 
@@ -98,7 +130,11 @@ export async function PATCH(req, { params }) {
     update.protectedBanners = body.protectedBanners;
   }
 
-  const doc = await Page.findByIdAndUpdate(params.id, update, { new: true, runValidators: true }).lean();
+  const doc = await Page.findByIdAndUpdate(params.id, update, {
+    new: true,
+    runValidators: true,
+  }).lean();
+
   if (!doc) return json({ error: 'Not found' }, { status: 404 });
   return json(doc);
 }

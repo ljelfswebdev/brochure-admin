@@ -35,8 +35,11 @@ export default async function NewsListing({ searchParams }) {
   ]);
 
   return (
-    <section className="max-w-6xl mx-auto py-8">
-      <h1 className="text-2xl font-semibold mb-6">News</h1>
+    <section className="bg-linear py-16">
+      <div className="container">
+
+   
+      <h1 className="">News</h1>
 
       {/* grid with sidebar */}
       <div className="grid grid-cols-1 md:grid-cols-[280px,1fr] gap-6">
@@ -63,7 +66,7 @@ export default async function NewsListing({ searchParams }) {
                       : '/images/placeholder.png'; // place in /public/images/placeholder.png
 
                   return (
-                    <article key={n._id} className="border rounded-lg overflow-hidden bg-white">
+                    <article key={n._id} className="border-4 rounded-lg overflow-hidden bg-white border-tertiary">
                       <Link href={`/news/${n.slug}`} className="block group">
                         <div className="relative w-full aspect-[16/9]">
                           <Image
@@ -76,7 +79,7 @@ export default async function NewsListing({ searchParams }) {
                           />
                         </div>
                         <div className="p-3">
-                          <h2 className="font-medium group-hover:underline">{n.title}</h2>
+                          <h3 className="">{n.title}</h3>
                           {n.excerpt ? (
                             <p className="text-sm text-gray-600 mt-1 line-clamp-3">{n.excerpt}</p>
                           ) : null}
@@ -98,6 +101,7 @@ export default async function NewsListing({ searchParams }) {
           )}
         </div>
       </div>
+         </div>
     </section>
   );
 }

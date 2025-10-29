@@ -1,10 +1,13 @@
 .button{
     width:fit-content;
     white-space: nowrap;
-    padding: 4px 16px;
+    padding: 12px 24px;
     border-radius: var(--border-primary);
     border:2px solid;
     cursor:pointer;
+    display: flex;
+    text-align: center;
+    justify-content: center;
 }
 
 .button--primary{
