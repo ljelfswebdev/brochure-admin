@@ -1,9 +1,22 @@
+// app/admin/news/[id]/page.jsx
 'use client';
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
 import CloudinaryUpload from '@/components/admin/CloudinaryUpload';
 import PageBlocks from '@/components/admin/blocks/PageBlocks';
+import RichTextEditor from '@/components/admin/RichTextEditor';
+
+// normalize potential editor outputs (string | {html}|{value}|unknown) -> string
+function toHtmlString(v) {
+  if (v == null) return '';
+  if (typeof v === 'string') return v;
+  if (typeof v === 'object') {
+    if (typeof v.html === 'string') return v.html;
+    if (typeof v.value === 'string') return v.value;
+  }
+  return String(v);
+}
 
 export default function EditNews() {
   const { id } = useParams();
@@ -16,8 +29,8 @@ export default function EditNews() {
   // form state
   const [title, setTitle] = useState('');
   const [slug, setSlug] = useState('');
-  const [excerpt, setExcerpt] = useState('');
-  const [body, setBody] = useState('');
+  const [excerpt, setExcerpt] = useState('');    // HTML
+  const [body, setBody] = useState('');          // HTML
   const [listingImage, setListingImage] = useState('');
   const [status, setStatus] = useState('published');
   const [categoryIds, setCategoryIds] = useState([]);
@@ -35,11 +48,12 @@ export default function EditNews() {
         const d = await rDoc.json();
         const c = rCats.ok ? await rCats.json() : [];
         if (cancel) return;
+
         setCats(Array.isArray(c) ? c : []);
         setTitle(d.title || '');
         setSlug(d.slug || '');
-        setExcerpt(d.excerpt || '');
-        setBody(d.body || '');
+        setExcerpt(d.excerpt || '');          // may already be HTML
+        setBody(d.body || '');                // may already be HTML
         setListingImage(d.listingImage || '');
         setStatus(d.status || 'published');
         setCategoryIds(Array.isArray(d.categories) ? d.categories.map(String) : []);
@@ -63,12 +77,12 @@ export default function EditNews() {
       const payload = {
         title,
         slug: slug.replace(/^\//,''),
-        excerpt,
-        body,
+        excerpt: toHtmlString(excerpt),
+        body: toHtmlString(body),
         listingImage,
         status,
         categories: categoryIds,
-        blocks, // ✅ save blocks
+        blocks, // blocks already handled by PageBlocks
       };
       const r = await fetch(`/api/admin/news/${id}`, {
         method: 'PATCH',
@@ -97,11 +111,12 @@ export default function EditNews() {
   return (
     <div className="space-y-6">
       <a href="/admin/news" className="text-sm text-blue-600 hover:underline">← Back to News</a>
+
       <div className="card">
         <div className="flex items-center justify-between">
           <h1 className="text-lg font-semibold">Edit News</h1>
           <div className="flex gap-2">
-            <a className="button button--secondary" href={`/news/${slug}`} target="_blank">View</a>
+            <a className="button button--secondary" href={`/news/${slug}`} target="_blank" rel="noreferrer">View</a>
             <button className="button button--tertiary" onClick={remove}>Delete</button>
           </div>
         </div>
@@ -112,8 +127,8 @@ export default function EditNews() {
         <label className="label mt-2">Slug</label>
         <input className="input w-full" value={slug} onChange={e=>setSlug(e.target.value)} />
 
-        <label className="label mt-2">Excerpt</label>
-        <textarea className="input w-full" value={excerpt} onChange={e=>setExcerpt(e.target.value)} />
+        <label className="label mt-2">Excerpt (rich)</label>
+        <RichTextEditor value={excerpt} onChange={(val)=>setExcerpt(toHtmlString(val))} />
 
         <label className="label mt-2">Listing Image</label>
         <CloudinaryUpload value={listingImage} onChange={setListingImage} />
@@ -127,21 +142,24 @@ export default function EditNews() {
         <div className="mt-2">
           <div className="label">Categories</div>
           <div className="grid grid-cols-2 gap-2">
-            {cats.map(c => (
-              <label key={c._id} className="flex items-center gap-2 text-sm border rounded-md px-2 py-1">
-                <input
-                  type="checkbox"
-                  checked={categoryIds.includes(c._id)}
-                  onChange={() => toggleCat(c._id)}
-                />
-                {c.name}
-              </label>
-            ))}
+            {cats.map(c => {
+              const idStr = String(c._id);
+              return (
+                <label key={idStr} className="flex items-center gap-2 text-sm border rounded-md px-2 py-1">
+                  <input
+                    type="checkbox"
+                    checked={categoryIds.includes(idStr)}
+                    onChange={() => toggleCat(idStr)}
+                  />
+                  {c.name}
+                </label>
+              );
+            })}
           </div>
         </div>
 
-        <label className="label mt-3">Body (optional)</label>
-        <textarea className="input w-full" value={body} onChange={e=>setBody(e.target.value)} />
+        <label className="label mt-3">Body (rich, optional)</label>
+        <RichTextEditor value={body} onChange={(val)=>setBody(toHtmlString(val))} />
 
         <div className="mt-4">
           <div className="label mb-2">Blocks</div>

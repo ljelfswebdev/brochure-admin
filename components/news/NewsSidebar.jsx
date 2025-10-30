@@ -169,7 +169,7 @@ export default function NewsSidebar({ categories = [], basePath = '/news' }) {
         />
 
         {/* label text */}
-        <span className="text-gray-700 transition-colors peer-checked:text-primary">
+        <span className="text-white transition-colors peer-checked:text-primary">
           {c.name}
         </span>
       </label>

@@ -59,7 +59,7 @@ export default async function PageBySlug({ params }) {
   const [first, ...rest] = blocks;
 
   return (
-    <>
+    <div className="bg-linear">
       {/* First block: render immediately, no lazy-loading */}
       {first ? (() => {
         const FirstCmp = FIRST_BLOCK_REGISTRY[first.type];
@@ -68,6 +68,6 @@ export default async function PageBySlug({ params }) {
 
       {/* Remaining blocks: lazy load in the client */}
       {rest?.length ? <BlocksClient blocks={rest} /> : null}
-    </>
+    </div>
   );
 }

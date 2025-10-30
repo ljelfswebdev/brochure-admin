@@ -9,7 +9,7 @@ export default function RootLayout({ children }) {
     <html lang="en">
       <body>
         <Header />  {/* ✅ this automatically uses HeaderClient inside */}
-        <main className="min-h-[60vh]">{children}</main>
+        <main className="">{children}</main>
         <Footer />
       </body>
     </html>

@@ -17,7 +17,7 @@ export default function ImagesSection({ title, text, items }) {
   const Card = ({ it }) => {
     const img = it?.image || '/images/placeholder.png';
     return (
-      <div className="border-4 rounded  border-tertiary">
+      <div className="border-4 rounded  border-tertiary shadom-md hover:shadow-xl">
         <div className="relative w-full h-[400px] mb-2 overflow-hidden rounded">
           <Image
             src={img}
@@ -43,6 +43,7 @@ export default function ImagesSection({ title, text, items }) {
           <Link
             href={it.link.url}
             className="button button--primary inline-block mt-3 !w-full"
+            target='_blank'
           >
             {it.link.text || it.link.url}
           </Link>

@@ -140,8 +140,9 @@ export default async function NewsDetail({ params }) {
   const heroImg = item.listingImage?.trim() ? item.listingImage : PLACEHOLDER;
 
   return (
-    <section className="max-w-6xl mx-auto py-8">
-      <div className="grid grid-cols-1 md:grid-cols-[280px,1fr] gap-6">
+    <section className="py-16 bg-linear">
+      <div className="container">
+            <div className="grid grid-cols-1 md:grid-cols-[280px,1fr] gap-6">
         <div>
           <NewsSidebar categories={cats} basePath="/news" />
         </div>
@@ -198,6 +199,8 @@ export default async function NewsDetail({ params }) {
           ) : null}
         </article>
       </div>
+      </div>
+  
     </section>
   );
 }
